@@ -1,0 +1,107 @@
+<html>
+	<head>
+		<title>SBHC Status</title>
+		<style type="text/css">
+			.square {
+				width: 100px;
+				height: 100px;
+				background: gray;
+			}
+			.left {
+				padding-left: 75px;
+			}
+			.squareCell {
+				padding-left: 20px;
+				display: inline-block;
+			}
+		</style>
+		<script src="https://code.jquery.com/jquery-1.11.0.min.js"></script>
+		<link rel="stylesheet" type="text/css" href="https://bootswatch.com/darkly/bootstrap.min.css">
+		<script type="text/javascript">
+			function clearValue(name){
+				console.log("Resetting value for " + name);
+				$.ajax({
+			            type: 'GET',
+			            url: 'button_update.php?name=' + name + '&value=0',
+			            data: $(this).serialize(),
+			            dataType: 'json',
+			            success: function (data) {
+			            	console.log("Success");
+			            	document.getElementById(name).style.background = "gray";
+			            }
+			    });
+			}
+		</script>
+	</head>
+	<body>
+	<center>
+		<div>
+			<h1>SBHC Trailer Status</h1>
+		</div>
+		<div class="squareCell">
+			<h4> Photo Booth</h4>
+			<div id="photo_booth" class="square">
+				<a class="left" onclick="clearValue('photo_booth');" href="#">x</a>
+			</div>
+		</div>
+		<div class="squareCell">
+			<h4> Ticket Taker</h4>
+			<div id="ticket_taker" class="square">
+				<a class="left" onclick="clearValue('ticket_taker');" href="#">x</a>
+			</div>
+		</div>
+		</center>
+	</body>
+	<script type="text/javascript">
+	function clearValue(name){
+			console.log("Resetting value for " + name);
+			$.ajax({
+			    type: 'GET',
+			    url: 'button_update.php?name=' + name + '&value=0',
+			    data: $(this).serialize(),
+			    dataType: 'json',
+			    success: function (data) {
+			    	console.log("Success");
+			    	document.getElementById(name).style.background = "gray";
+				}
+			});
+	}
+	var interval = 1000;  // 1000 = 1 second, 3000 = 3 seconds
+	function doAjax() {
+		console.log("Requesting Status...");
+	    $.ajax({
+	            type: 'GET',
+	            url: 'button_status.php',
+	            data: $(this).serialize(),
+	            dataType: 'json',
+	            success: function (data) {
+	            	console.log(JSON.stringify(data));
+	            	for (var i = 0; i < data.length; i++) {
+	            		switch (data[i].value) {
+		                	case "0":
+		                		document.getElementById(data[i].name).style.background = "gray";
+		                		break;
+		                	case "1":
+		                		document.getElementById(data[i].name).style.background = "green";
+		                		break;
+		                	case "2":
+		                		document.getElementById(data[i].name).style.background = "yellow";
+		                		break;
+		                	case "3":
+		                		document.getElementById(data[i].name).style.background = "red";
+		                		break;
+		                	default:
+		                		document.getElementById(data[i].name).style.background = "gray";
+		                		break;
+		                }
+	            	};
+	            },
+	            complete: function (data) {
+	                    // Schedule the next
+	                    setTimeout(doAjax, interval);
+	            }
+	    });
+	}
+	setTimeout(doAjax, interval);
+	</script>
+</html>
